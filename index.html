@@ -6,7 +6,7 @@
     <title>Test Image Upload</title>
 </head>
 <body>
-    <form id="upload" onsubmit="handleSubmit(event)">
+    <form id="upload" onsubmit="handleSubmit(event)" onmouseleave="handleAbandonment(event)">
         <label for="name">Name</label>
         <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
         <label for="email">Email</label>
@@ -63,14 +63,14 @@
         // uploads image to image kit
         fetchManager(imageKitUrl, POST, formData).then((data) => {
 
-            const serializedData = {url: data.url, nam: data.name}
+            const serializedData = {url: data.url, name: data.name}
             const imageBody = JSON.stringify({[`image${imageCount}`]: serializedData});
             // sends data we get back from image kit to server
             fetchManager(putURL, PUT, imageBody, jsonHeader).then(() => {
                 console.log("Success!")
             }).catch((err) => {
-                console.error(err);
-            })
+                console.error("Unable to upload image.");
+            });
         }).catch(err => console.error(err));
 
     };
@@ -86,32 +86,31 @@
                 !docId && sessionStorage.setItem("docId", data.docId)
             }).catch((err) => {
                 console.error(err);
-            })
+            });
 
-        }
+        };
     };
 
-    async function abandonQuote () {
+    async function handleAbandonment (event) {
+        const formData = new FormData(event.target);
 
+        console.log(Object.fromEntries.formData)
     }
 
     async function photoAuth () {
-        const url = `${tinyFormUrl}upload`
+        const url = `${tinyFormUrl}upload`;
         fetchManager(tinyFormUrl, GET).then((data) => {
-            return data
-        })
-    }
+            return data;
+        });
+    };
     
 
     const logFile = async (event) => {
-        let str = event.target.result;
+        let base64Image = event.target.result;
 
         photoAuth().then((authData) => {
-
-            uploadImage(str, authData).then((response) => {
-                
-            }).catch(error => console.log(error))
-        }). catch(error => console.log(error))
+            uploadImage(base64Image, authData).catch(error => console.log(error));
+        }).catch(error => console.log(error));
     }
 
     const handleImageInput = async (event) => {
@@ -119,13 +118,10 @@
 
         if (event.target.value && docId) {   
             fileName = event.target.files[0].name
-
-            let reader = new FileReader()
-
             imageCount ++;
 
+            let reader = new FileReader();
             reader.onload = logFile;
-
             reader.readAsDataURL(event.target.files[0])
         };
 
@@ -133,20 +129,16 @@
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        let docId = sessionStorage.getItem("docId")
-        const putRes = await fetch (`${url}quote/${docId}`, {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({submitted: true}),
-        })
+        const docId = sessionStorage.getItem("docId");
+        const url = `${tinyFormUrl}quote/${docId}`;
+        const body = JSON.stringify({submitted: true});
 
-        if (!putRes.ok) {
-            throw new Error("PUT Error:", putRes.status);
-        }
-
-    }
+        fetchManager(url, PUT, body, jsonHeader).then(() => {
+            console.log("data succesfully submitted");
+        }).catch(() => {
+            console.log("Unable to submit quote");
+        });
+    };
 
 </script>
 </body>
