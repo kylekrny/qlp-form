@@ -96,16 +96,10 @@
     }
 
     async function photoAuth () {
-        const getAuth = await fetch (`${tinyFormUrl}upload`)
-
-        if (!getAuth.ok) {
-            throw new Error("unable to upload image")
-        }  else {
-            const data = getAuth.json();
-
-            return data;
-            
-        }
+        const url = `${tinyFormUrl}upload`
+        fetchManager(tinyFormUrl, GET).then((data) => {
+            return data
+        })
     }
     
 
