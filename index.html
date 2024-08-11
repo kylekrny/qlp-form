@@ -30,6 +30,9 @@
     const tinyFormUrl = "http://localhost:3000/";
     const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
     const jsonHeader = {'Content-Type': 'application/json'}
+    const POST = "POST";
+    const PUT = "PUT";
+    const GET = "GET";
 
 
     const fetchManager = async (url, method, body, headers) => {
@@ -57,12 +60,13 @@
         formData.append('token', authData.token);
         formData.append('publicKey', 'public_2AP5qW3G4Go1j4IJj36sCR+Zr9k=')
 
-        fetchManager(imageKitUrl, "POST", formData).then((data) => {
+        // uploads image to image kit
+        fetchManager(imageKitUrl, POST, formData).then((data) => {
 
             const serializedData = {url: data.url, nam: data.name}
             const imageBody = JSON.stringify({[`image${imageCount}`]: serializedData});
-
-            fetchManager(putURL, "PUT", imageBody, jsonHeader).then(() => {
+            // sends data we get back from image kit to server
+            fetchManager(putURL, PUT, imageBody, jsonHeader).then(() => {
                 console.log("Success!")
             }).catch((err) => {
                 console.error(err);
@@ -72,46 +76,25 @@
     };
     
     const handleTextInput = async (event) => {
-        let hasId = sessionStorage.getItem("docId")
-        console.log(hasId)
-        const postBody = {[event.target.id]: event.target.value};
+        if (event.target.value) {   
+            let docId = sessionStorage.getItem("docId")
+            const body = JSON.stringify({[event.target.id]: event.target.value});
+            const url = `${tinyFormUrl}quote${docId ? `/${docId}` : ''}`;
+            const method = docId ? PUT : POST;
 
-        if (!hasId && event.target.value) {
+            fetchManager(url, method, body, jsonHeader).then((data) => {
+                !docId && sessionStorage.setItem("docId", data.docId)
+            }).catch((err) => {
+                console.error(err);
+            })
 
-
-            const postRes = await fetch(`${tinyFormUrl}quote`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postBody),
-            });
-            
-            if (!postRes.ok) {
-                throw new Error("POST Error:", postRes.status);
-            }
-            
-            const data = await postRes.json();
-            sessionStorage.setItem("docId", data.docId)
-        } else if (event.target.value) {
-        const putRes = await fetch (`${tinyFormUrl}quote/${hasId}`, {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postBody),
-        })
-
-        if (!putRes.ok) {
-            throw new Error("PUT Error:", putRes.status);
-        }
         }
     };
 
     async function abandonQuote () {
 
     }
-    // if a customer focuses on the photo first, call the auth end point
+
     async function photoAuth () {
         const getAuth = await fetch (`${tinyFormUrl}upload`)
 
@@ -155,6 +138,7 @@
     };
 
     const handleSubmit = async (event) => {
+        event.preventDefault();
         let docId = sessionStorage.getItem("docId")
         const putRes = await fetch (`${url}quote/${docId}`, {
             method: "PUT",
