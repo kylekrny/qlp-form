@@ -6,38 +6,50 @@
     <title>Test Image Upload</title>
 </head>
 <body>
-    <form id="upload">
+    <form id="upload" onsubmit="handleSubmit(event)">
         <label for="name">Name</label>
-        <input type="text" name="name" id="name" onblur="inputFunction(event)">
+        <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
         <label for="email">Email</label>
-        <input type="email" id="email" onblur="inputFunction(event)">
+        <input type="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
         <label for="size">Size</label>
-        <input type="text" id="size" onblur="inputFunction(event)">
+        <input type="text" id="size" onblur="handleTextInput(event)">
         <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" onblur="inputFunction(event)">
+        <input type="number" id="quantity" onblur="handleTextInput(event)">
         <label for="message">Message</label>
-        <textarea name="message" id="message" onblur="inputFunction(event)"></textarea>
-        <label for="file">Image #1 to upload</label>
+        <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
+        <label for="image1">Image #1 to upload</label>
         <input type="file" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
-        <label for="file">Image #2 to upload</label>
+        <label for="image2">Image #2 to upload</label>
         <input type="file" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
         <button type="submit">Submit</button>
     </form>
-    <div id="app"></div>
 <script>
     sessionStorage.clear();
-    let form = document.querySelector('#upload');
-	let file = document.querySelector('#file');
-	let app = document.querySelector('#app');
-    let images = document.querySelectorAll("input.image-input")
     let fileName = "";
     let imageCount = 0;
+    const tinyFormUrl = "http://localhost:3000/";
+    const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
+    const jsonHeader = {'Content-Type': 'application/json'}
+
+
+    const fetchManager = async (url, method, body, headers) => {
+        const response = await fetch(url, {method, body, headers: {...headers}})
+
+        if (!response.ok) {
+            throw new Error ("Unable to complet your API Request");
+        } else {
+            const data = await response.json()
+
+            return data;
+        }
+    }
 
     async function uploadImage (image, authData) {
         const docId = sessionStorage.getItem("docId")
+        const putURL = `${tinyFormUrl}quote/${docId}`
+
 
         const formData = new FormData();
-
         formData.append('file', image);
         formData.append('fileName', fileName);
         formData.append('signature', authData.signature);
@@ -45,36 +57,21 @@
         formData.append('token', authData.token);
         formData.append('publicKey', 'public_2AP5qW3G4Go1j4IJj36sCR+Zr9k=')
 
-        const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-            method: "POST",
-                body: formData,
-            });
+        fetchManager(imageKitUrl, "POST", formData).then((data) => {
 
-        if (!response.ok) {
-            throw new ERROR ("image was not able to be uploaded")
-        } else {
-            const responseData = await response.json();
-            
-        const putRes = await fetch (`${url}quote/${docId}`, {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({[`image${imageCount}`]: responseData}),
-        })
+            const serializedData = {url: data.url, nam: data.name}
+            const imageBody = JSON.stringify({[`image${imageCount}`]: serializedData});
 
-        if (!putRes.ok) {
-            throw new Error("PUT Error:", putRes.status);
-        }
-
-
-        }
+            fetchManager(putURL, "PUT", imageBody, jsonHeader).then(() => {
+                console.log("Success!")
+            }).catch((err) => {
+                console.error(err);
+            })
+        }).catch(err => console.error(err));
 
     };
-
-    const url = "http://localhost:3000/";
     
-    async function inputFunction (event) {
+    const handleTextInput = async (event) => {
         let hasId = sessionStorage.getItem("docId")
         console.log(hasId)
         const postBody = {[event.target.id]: event.target.value};
@@ -82,10 +79,9 @@
         if (!hasId && event.target.value) {
 
 
-            const postRes = await fetch(`${url}quote`, {
+            const postRes = await fetch(`${tinyFormUrl}quote`, {
                 method: "POST",
                 headers: {
-                    'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVMWlpIOW15a2VUc080em1fOXFjTCJ9.eyJpc3MiOiJodHRwczovL2Rldi1reWxlLmF1dGgwLmNvbS8iLCJzdWIiOiJ0bGltUlZTRUhlM3p4bE5DdE9pVjA2QzFEYXIxVVJ4R0BjbGllbnRzIiwiYXVkIjoicXVhbGl0eWxhcGVscGlucy5jb20iLCJpYXQiOjE3MjMyMjgwNDcsImV4cCI6MTcyMzMxNDQ0NywiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXpwIjoidGxpbVJWU0VIZTN6eGxOQ3RPaVYwNkMxRGFyMVVSeEcifQ.owPCpKl27JsOG_5IYSnJGDdXgSvnuZx75lDoFRjq-s_rp9vDvfpIqbZVuaQJV-Dmf1rIVPUdt4fWDCHVhspR3JHT6eLw5oIgzwXJuCsa8l3HoLOelVtPDorORkimz9SF-xofzsuEa9ZbbB14g6VEKEaj0b83LKDt6T22O7sfCeOz_DDCwBqDyTRKNxpj2fZ8EeC60gXrc78H4kZ7v6tE9SofGPUVPYto2W53rtCXQyp5fpGYi0X1gTD9QQ1ahBvglMnrQ2g-RpyzGv_6yJduC-EZtemT4hIW1YOsyc2ME_IjYVJZlKyQXNlPzKLzI-2u4F6a4_CF7Pgi1HUjZMhAIw',
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(postBody),
@@ -98,7 +94,7 @@
             const data = await postRes.json();
             sessionStorage.setItem("docId", data.docId)
         } else if (event.target.value) {
-        const putRes = await fetch (`${url}quote/${hasId}`, {
+        const putRes = await fetch (`${tinyFormUrl}quote/${hasId}`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json'
@@ -117,7 +113,7 @@
     }
     // if a customer focuses on the photo first, call the auth end point
     async function photoAuth () {
-        const getAuth = await fetch (`${url}upload`)
+        const getAuth = await fetch (`${tinyFormUrl}upload`)
 
         if (!getAuth.ok) {
             throw new Error("unable to upload image")
@@ -144,8 +140,6 @@
     const handleImageInput = async (event) => {
         const docId = sessionStorage.getItem("docId")
 
-        console.log(event.target.files[0].type)
-
         if (event.target.value && docId) {   
             fileName = event.target.files[0].name
 
@@ -161,6 +155,7 @@
     };
 
     const handleSubmit = async (event) => {
+        let docId = sessionStorage.getItem("docId")
         const putRes = await fetch (`${url}quote/${docId}`, {
             method: "PUT",
             headers: {
@@ -174,8 +169,6 @@
         }
 
     }
-
-    form.addEventListener('submit', handleSubmit)
 
 </script>
 </body>
