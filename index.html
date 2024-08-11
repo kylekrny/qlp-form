@@ -160,7 +160,22 @@
 
     };
 
-    // form.addEventListener('submit', handleSubmit)
+    const handleSubmit = async (event) => {
+        const putRes = await fetch (`${url}quote/${docId}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({submitted: true}),
+        })
+
+        if (!putRes.ok) {
+            throw new Error("PUT Error:", putRes.status);
+        }
+
+    }
+
+    form.addEventListener('submit', handleSubmit)
 
 </script>
 </body>
