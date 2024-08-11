@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Upload</title>
+</head>
+<body>
+    <form id="upload">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" onblur="inputFunction(event)">
+        <label for="email">Email</label>
+        <input type="email" id="email" onblur="inputFunction(event)">
+        <label for="size">Size</label>
+        <input type="text" id="size" onblur="inputFunction(event)">
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity" onblur="inputFunction(event)">
+        <label for="message">Message</label>
+        <textarea name="message" id="message" onblur="inputFunction(event)"></textarea>
+        <label for="file">Image #1 to upload</label>
+        <input type="file" id="file1" accept="image/*">
+        <label for="file">Image #2 to upload</label>
+        <input type="file" id="file2" accept="image/*">
+        <button type="submit">Submit</button>
+    </form>
+    <div id="app"></div>
+<script>
+    sessionStorage.clear();
+    let form = document.querySelector('#upload');
+	let file = document.querySelector('#file');
+	let app = document.querySelector('#app');
+
+    console.log(sessionStorage.getItem("docId"))
+    async function uploadImage (image) {
+        const formData = new FormData();
+
+        formData.append('file', image);
+        formData.append('fileName', 'image-upload-2');
+        formData.append('signature', 'a28e6aff0455c419a8361300359b1e980621d68f');
+        formData.append('expire', '1723173408');
+        formData.append('token', 'c5b4268a-d165-4c37-a20c-cb489971e539');
+        formData.append('publicKey', 'public_2AP5qW3G4Go1j4IJj36sCR+Zr9k=')
+
+        console.log(image)
+
+        await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+            method: "POST",
+                body: formData,
+            });
+    };
+
+    const url = "http://localhost:3000/";
+
+    async function quoteFunction (event) {
+        let hasId = sessionStorage.getItem("docId")
+
+        console.log(hasId)
+        const postBody = {[event.target.id]: event.target.value};
+
+        if (!hasId && event.target.value) {
+
+
+            const postRes = await fetch(`${url}quote`, {
+                method: "POST",
+                headers: {
+                    'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVMWlpIOW15a2VUc080em1fOXFjTCJ9.eyJpc3MiOiJodHRwczovL2Rldi1reWxlLmF1dGgwLmNvbS8iLCJzdWIiOiJ0bGltUlZTRUhlM3p4bE5DdE9pVjA2QzFEYXIxVVJ4R0BjbGllbnRzIiwiYXVkIjoicXVhbGl0eWxhcGVscGlucy5jb20iLCJpYXQiOjE3MjMyMjgwNDcsImV4cCI6MTcyMzMxNDQ0NywiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXpwIjoidGxpbVJWU0VIZTN6eGxOQ3RPaVYwNkMxRGFyMVVSeEcifQ.owPCpKl27JsOG_5IYSnJGDdXgSvnuZx75lDoFRjq-s_rp9vDvfpIqbZVuaQJV-Dmf1rIVPUdt4fWDCHVhspR3JHT6eLw5oIgzwXJuCsa8l3HoLOelVtPDorORkimz9SF-xofzsuEa9ZbbB14g6VEKEaj0b83LKDt6T22O7sfCeOz_DDCwBqDyTRKNxpj2fZ8EeC60gXrc78H4kZ7v6tE9SofGPUVPYto2W53rtCXQyp5fpGYi0X1gTD9QQ1ahBvglMnrQ2g-RpyzGv_6yJduC-EZtemT4hIW1YOsyc2ME_IjYVJZlKyQXNlPzKLzI-2u4F6a4_CF7Pgi1HUjZMhAIw',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postBody),
+            });
+            
+            if (!postRes.ok) {
+                throw new Error("POST Error:", postRes.status);
+            }
+            
+            const data = await postRes.json();
+            sessionStorage.setItem("docId", data.docId)
+        } else if (event.target.value) {
+        const putRes = await fetch (`${url}quote/${hasId}`, {
+            method: "PUT",
+            headers: {
+                'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImVMWlpIOW15a2VUc080em1fOXFjTCJ9.eyJpc3MiOiJodHRwczovL2Rldi1reWxlLmF1dGgwLmNvbS8iLCJzdWIiOiJ0bGltUlZTRUhlM3p4bE5DdE9pVjA2QzFEYXIxVVJ4R0BjbGllbnRzIiwiYXVkIjoicXVhbGl0eWxhcGVscGlucy5jb20iLCJpYXQiOjE3MjMyMjgwNDcsImV4cCI6MTcyMzMxNDQ0NywiZ3R5IjoiY2xpZW50LWNyZWRlbnRpYWxzIiwiYXpwIjoidGxpbVJWU0VIZTN6eGxOQ3RPaVYwNkMxRGFyMVVSeEcifQ.owPCpKl27JsOG_5IYSnJGDdXgSvnuZx75lDoFRjq-s_rp9vDvfpIqbZVuaQJV-Dmf1rIVPUdt4fWDCHVhspR3JHT6eLw5oIgzwXJuCsa8l3HoLOelVtPDorORkimz9SF-xofzsuEa9ZbbB14g6VEKEaj0b83LKDt6T22O7sfCeOz_DDCwBqDyTRKNxpj2fZ8EeC60gXrc78H4kZ7v6tE9SofGPUVPYto2W53rtCXQyp5fpGYi0X1gTD9QQ1ahBvglMnrQ2g-RpyzGv_6yJduC-EZtemT4hIW1YOsyc2ME_IjYVJZlKyQXNlPzKLzI-2u4F6a4_CF7Pgi1HUjZMhAIw',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postBody),
+        })
+
+        if (!putRes.ok) {
+            throw new Error("PUT Error:", putRes.status);
+        }
+        }
+    };
+
+    async function abandonQuote () {
+
+    }
+    // if a customer focuses on the photo first, call the auth end point
+    async function photoFocus () {
+
+    }
+    
+
+    function logFile (event) {
+        let str = event.target.result;
+        let img = document.createElement('img');
+        img.src = str;
+        uploadImage(str).then((data) => {
+            console.log(data);
+            app.append(img);
+
+        }).catch(error => console.log(error))
+    }
+
+    async function handleSubmit (event) {
+        event.preventDefault();
+
+        if (file.value.length) {  
+            let reader = new FileReader();
+            
+            reader.onload = logFile;
+            
+            reader.readAsDataURL(file.files[0])
+        };
+    };
+
+    form.addEventListener('submit', handleSubmit)
+
+</script>
+</body>
+</html>
