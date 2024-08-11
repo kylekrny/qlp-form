@@ -18,9 +18,9 @@
         <label for="message">Message</label>
         <textarea name="message" id="message" onblur="inputFunction(event)"></textarea>
         <label for="file">Image #1 to upload</label>
-        <input type="file" id="file1" accept="image/*">
+        <input type="file" id="file1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
         <label for="file">Image #2 to upload</label>
-        <input type="file" id="file2" accept="image/*">
+        <input type="file" id="file2" accept="image/*" class="image-input">
         <button type="submit">Submit</button>
     </form>
     <div id="app"></div>
@@ -29,29 +29,39 @@
     let form = document.querySelector('#upload');
 	let file = document.querySelector('#file');
 	let app = document.querySelector('#app');
+    let images = document.querySelectorAll("input.image-input")
+    let uploadedImages = [];
 
-    console.log(sessionStorage.getItem("docId"))
-    async function uploadImage (image) {
+    async function uploadImage (image, authData) {
         const formData = new FormData();
 
         formData.append('file', image);
         formData.append('fileName', 'image-upload-2');
-        formData.append('signature', 'a28e6aff0455c419a8361300359b1e980621d68f');
-        formData.append('expire', '1723173408');
-        formData.append('token', 'c5b4268a-d165-4c37-a20c-cb489971e539');
+        formData.append('signature', authData.signature);
+        formData.append('expire', authData.expire);
+        formData.append('token', authData.token);
         formData.append('publicKey', 'public_2AP5qW3G4Go1j4IJj36sCR+Zr9k=')
 
         console.log(image)
 
-        await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+        const response = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
             method: "POST",
                 body: formData,
             });
+
+        if (!response.ok) {
+            throw new ERROR ("image was not able to be uploaded")
+        } else {
+            const responseData = await response.json();
+            return responseData;
+
+        }
+
     };
 
     const url = "http://localhost:3000/";
 
-    async function quoteFunction (event) {
+    async function inputFunction (event) {
         let hasId = sessionStorage.getItem("docId")
 
         console.log(hasId)
@@ -95,35 +105,54 @@
 
     }
     // if a customer focuses on the photo first, call the auth end point
-    async function photoFocus () {
+    async function photoAuth () {
+        const getAuth = await fetch (`${url}upload`)
 
+        if (!getAuth.ok) {
+            throw new Error("unable to upload image")
+        }  else {
+            const data = getAuth.json();
+
+            return data;
+            
+        }
     }
     
 
-    function logFile (event) {
+    const logFile = async (event) => {
         let str = event.target.result;
-        let img = document.createElement('img');
-        img.src = str;
-        uploadImage(str).then((data) => {
-            console.log(data);
-            app.append(img);
 
-        }).catch(error => console.log(error))
+        photoAuth().then((authData) => {
+
+            uploadImage(str, authData).then((response) => {
+                console.log(uploadedImages)
+                
+            }).catch(error => console.log(error))
+        }). catch(error => console.log(error))
     }
 
-    async function handleSubmit (event) {
-        event.preventDefault();
+    const handleImageInput = async (event) => {
 
-        if (file.value.length) {  
-            let reader = new FileReader();
+        if (event.target.value) {   
+            console.log(event.target.files[0].name)
+        }
+
+        // for (let index = 0; index < images.length; index++) {
+        //     const element = images[index];
             
-            reader.onload = logFile;
-            
-            reader.readAsDataURL(file.files[0])
-        };
+        //     if (element.value.length) {
+        //         let reader = new FileReader();
+
+        //         reader.onload = logFile;
+
+        //         reader.readAsDataURL(images[index].files[0])
+        //     }
+        // }
+
+        // console.log("Uploaded Images", uploadedImages)
     };
 
-    form.addEventListener('submit', handleSubmit)
+    // form.addEventListener('submit', handleSubmit)
 
 </script>
 </body>
