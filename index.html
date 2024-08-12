@@ -6,27 +6,32 @@
     <title>Test Image Upload</title>
 </head>
 <body>
-    <form id="upload" onsubmit="handleSubmit(event)" onmouseleave="handleAbandonment(event)">
+    <form id="quote-form" onsubmit="handleSubmit(event)" onmouseleave="handleFormExit(event)" onmouseover="handleFormEnter(event)">
         <label for="name">Name</label>
         <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
         <label for="email">Email</label>
-        <input type="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
+        <input type="email" name="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
         <label for="size">Size</label>
-        <input type="text" id="size" onblur="handleTextInput(event)">
+        <input type="text" name="size" id="size" onblur="handleTextInput(event)">
         <label for="quantity">Quantity</label>
-        <input type="number" id="quantity" onblur="handleTextInput(event)">
+        <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)">
         <label for="message">Message</label>
         <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
         <label for="image1">Image #1 to upload</label>
-        <input type="file" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
+        <input type="file" name="image1" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
         <label for="image2">Image #2 to upload</label>
-        <input type="file" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
+        <input type="file" name=image2" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
         <button type="submit">Submit</button>
     </form>
 <script>
-    sessionStorage.clear();
     let fileName = "";
     let imageCount = 0;
+    let formOccupied = false;
+    let timer = 0;
+    let timeout;
+    let timerOn = false;
+    const timerLimit = 5;
+    const quoteForm = document.getElementById("quote-form");
     const tinyFormUrl = "http://localhost:3000/";
     const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
     const jsonHeader = {'Content-Type': 'application/json'}
@@ -91,11 +96,45 @@
         };
     };
 
-    async function handleAbandonment (event) {
-        const formData = new FormData(event.target);
+    const manageTimeout = () => {
+        timer ++
+        timeout = setTimeout(manageTimeout, 1000);
 
-        console.log(Object.fromEntries.formData)
+        console.log("timer");
+
+        if (timer >= timerLimit) {
+            console.log("timer exceeded")
+             const docId = sessionStorage.getItem("docId");
+            const exitUrl = `${tinyFormUrl}exit/${docId}`;
+            const body = JSON.stringify({abandoned: true});
+
+            fetchManager(exitUrl, GET).then(() => {
+            console.log("data succesfully submitted");
+                clearTimeout(timeout);
+            }).catch((err) => {
+            console.log("Unable to submit quote", err);
+                clearTimeout(timeout);
+            });
+
+        }
     }
+
+    const handleFormExit = (event) => {
+        let docId = sessionStorage.getItem("docId");
+
+        if (!timerOn && docId) {
+            timerOn = true;
+            console.log("timer on")
+            manageTimeout();
+        }
+
+    }
+
+    const handleFormEnter = () => {
+        clearTimeout(timeout);
+        timerOn = false;
+        timer = 0;
+    };
 
     async function photoAuth () {
         const url = `${tinyFormUrl}upload`;
@@ -133,11 +172,13 @@
         const url = `${tinyFormUrl}quote/${docId}`;
         const body = JSON.stringify({submitted: true});
 
-        fetchManager(url, PUT, body, jsonHeader).then(() => {
-            console.log("data succesfully submitted");
-        }).catch(() => {
-            console.log("Unable to submit quote");
-        });
+        if (docId) {   
+            fetchManager(url, PUT, body, jsonHeader).then(() => {
+                console.log("data succesfully submitted");
+            }).catch(() => {
+                console.log("Unable to submit quote");
+            });
+        }
     };
 
 </script>
