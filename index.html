@@ -14,7 +14,7 @@
         <label for="size">Size</label>
         <input type="text" name="size" id="size" onblur="handleTextInput(event)">
         <label for="quantity">Quantity</label>
-        <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)">
+        <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)" min="1">
         <label for="message">Message</label>
         <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
         <label for="image1">Image #1 to upload</label>
@@ -24,15 +24,16 @@
         <button type="submit">Submit</button>
     </form>
 <script>
+    sessionStorage.clear();
     let fileName = "";
     let imageCount = 0;
     let formOccupied = false;
     let timer = 0;
     let timeout;
     let timerOn = false;
-    const timerLimit = 5;
+    const timerLimit = 60;
     const quoteForm = document.getElementById("quote-form");
-    const tinyFormUrl = "http://localhost:3000/";
+    const tinyFormUrl = "https://qlp-server-if5ncioobq-uc.a.run.app/";
     const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
     const jsonHeader = {'Content-Type': 'application/json'}
     const POST = "POST";
@@ -44,7 +45,7 @@
         const response = await fetch(url, {method, body, headers: {...headers}})
 
         if (!response.ok) {
-            throw new Error ("Unable to complet your API Request");
+            throw new Error ("Unable to complete your API Request");
         } else {
             const data = await response.json()
 
@@ -67,12 +68,10 @@
 
         // uploads image to image kit
         fetchManager(imageKitUrl, POST, formData).then((data) => {
-
             const serializedData = {url: data.url, name: data.name}
             const imageBody = JSON.stringify({[`image${imageCount}`]: serializedData});
             // sends data we get back from image kit to server
             fetchManager(putURL, PUT, imageBody, jsonHeader).then(() => {
-                console.log("Success!")
             }).catch((err) => {
                 console.error("Unable to upload image.");
             });
@@ -100,20 +99,17 @@
         timer ++
         timeout = setTimeout(manageTimeout, 1000);
 
-        console.log("timer");
-
         if (timer >= timerLimit) {
-            console.log("timer exceeded")
              const docId = sessionStorage.getItem("docId");
             const exitUrl = `${tinyFormUrl}exit/${docId}`;
             const body = JSON.stringify({abandoned: true});
 
             fetchManager(exitUrl, GET).then(() => {
-            console.log("data succesfully submitted");
                 clearTimeout(timeout);
+                sessionStorage.clear();
             }).catch((err) => {
-            console.log("Unable to submit quote", err);
                 clearTimeout(timeout);
+                sessionStorage.clear();
             });
 
         }
@@ -124,7 +120,6 @@
 
         if (!timerOn && docId) {
             timerOn = true;
-            console.log("timer on")
             manageTimeout();
         }
 
@@ -138,9 +133,7 @@
 
     async function photoAuth () {
         const url = `${tinyFormUrl}upload`;
-        fetchManager(tinyFormUrl, GET).then((data) => {
-            return data;
-        });
+        return fetchManager(url, GET)
     };
     
 
@@ -157,9 +150,9 @@
 
         if (event.target.value && docId) {   
             fileName = event.target.files[0].name
-            imageCount ++;
-
+            
             let reader = new FileReader();
+            imageCount ++;
             reader.onload = logFile;
             reader.readAsDataURL(event.target.files[0])
         };
@@ -174,13 +167,74 @@
 
         if (docId) {   
             fetchManager(url, PUT, body, jsonHeader).then(() => {
-                console.log("data succesfully submitted");
+                sessionStorage.clear();
             }).catch(() => {
-                console.log("Unable to submit quote");
+                sessionStorage.clear();
             });
         }
     };
 
 </script>
+<style>
+   #quote-form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+   }
+
+   #quote-form label {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 5px;
+    margin-top: 10px;
+   }
+
+   #quote-form input, textarea {
+    border-radius: 5px;
+    border: 1px solid #c9cfd6;
+    height: 30px;
+   }
+
+   #quote-form button {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #0075c9;
+    color: white;
+    font-size: 20px;
+    border-radius: 10px;
+    border: none;
+    margin-top: 15px;
+   }
+
+    #quote-form input::file-selector-button {
+        background-color: transparent;
+        border: 1px solid #0075c9;
+        border-radius: 5px;
+        color: #0075c9;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+
+    }
+
+    #quote-form .image-input {
+        border: none;
+        height: 40px;
+    }
+
+    #quote-form #message {
+        height: 60px;
+    }
+
+    #quote-form input::file-selector-button:active {
+        background-color: #0075c9;
+        color: white;
+    }
+
+    #quote-form input::file-selector-button:hover {
+        background-color: #0075c9;
+        color: white;
+    }
+</style>
 </body>
 </html>
