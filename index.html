@@ -4,25 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Image Upload</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
 <body>
-    <form id="quote-form" onsubmit="handleSubmit(event)" onmouseleave="handleFormExit(event)" onmouseover="handleFormEnter(event)">
-        <label for="name">Name</label>
-        <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
-        <label for="size">Size</label>
-        <input type="text" name="size" id="size" onblur="handleTextInput(event)">
-        <label for="quantity">Quantity</label>
-        <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)" min="1">
-        <label for="message">Message</label>
-        <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
-        <label for="image1">Image #1 to upload</label>
-        <input type="file" name="image1" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
-        <label for="image2">Image #2 to upload</label>
-        <input type="file" name=image2" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
-        <button type="submit">Submit</button>
-    </form>
+    <div id="form-container">
+        <div id="success-message">
+            <h2>Thank you!</h2>
+            <h6>We have received your request.</h6>
+            <p>
+                Next, you will recieve an email from one of our team members with a quote and digital proof.
+            </p>
+
+            <p>If you have any questions you can call us at <a href="tel:+18009520305">1-800-952-0305.</a></p>
+
+            <button>Submit again</button>
+        </div>
+        <form id="quote-form" onsubmit="handleSubmit(event)" onmouseleave="handleFormExit(event)" onmouseover="handleFormEnter(event)">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
+            <label for="size">Size</label>
+            <input type="text" name="size" id="size" onblur="handleTextInput(event)">
+            <label for="quantity">Quantity</label>
+            <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)" min="1">
+            <label for="message">Message</label>
+            <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
+            <label for="image1">Image #1 to upload</label>
+            <input type="file" name="image1" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
+            <label for="image2">Image #2 to upload</label>
+            <input type="file" name=image2" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
 <script>
     sessionStorage.clear();
     let fileName = "";
@@ -44,12 +58,12 @@
 
     const fetchManager = async (url, method, body, headers) => {
         const response = await fetch(url, {method, body, headers: {...headers}})
-        if (response.status !== 200) {
+        if (!response.ok) {
             throw new Error ("Unable to complete your API Request");
         } else {
             const responseClone = response.clone();
             const data = await response.json();
-            
+
             return data;
         }
     }
@@ -177,10 +191,13 @@
 
 </script>
 <style>
+
+    #form-container {
+        width: 400px;
+    }
    #quote-form {
-    display: flex;
+    display: none;
     flex-direction: column;
-    width: 400px;
    }
 
    #quote-form label {
@@ -206,7 +223,7 @@
     margin-top: 15px;
    }
 
-    #quote-form input::file-selector-button {
+    #quote-form input::file-selector-button, #success-message button {
         background-color: transparent;
         border: 1px solid #0075c9;
         border-radius: 5px;
@@ -232,9 +249,46 @@
         color: white;
     }
 
-    #quote-form input::file-selector-button:hover {
+    #quote-form input::file-selector-button:hover, #success-message button:hover {
         background-color: #0075c9;
         color: white;
+    }
+
+    i {
+        color: green;
+        height: 50px;
+        width: auto;
+    }
+
+    #success-message {
+        font-family: Arial, Helvetica, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #success-message h2 {
+        font-weight: 300;
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+        font-size: 32px;
+        color: #0075c9;
+    }
+
+    #success-message h6 {
+        margin-top: 10px;
+    }
+
+    #success-message p {
+        width: 95%;
+        text-align: center;
+        margin-top: 0px;
+    }
+
+    #success-message a {
+        color: #0075c9;
+        text-decoration: none;
     }
 </style>
 </body>
