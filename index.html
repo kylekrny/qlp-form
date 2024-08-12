@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="form-container">
-        <div id="success-message">
+        <div id="success-message" class="message">
             <h2>Thank you!</h2>
             <h6>We have received your request.</h6>
             <p>
@@ -17,7 +17,19 @@
 
             <p>If you have any questions you can call us at <a href="tel:+18009520305">1-800-952-0305.</a></p>
 
-            <button>Submit again</button>
+            <button onclick="showForm(event)">Submit again</button>
+        </div>
+        <div id="error-message" class="message">
+           <h2>Whoops!</h2>
+            <h6>There was an internal error.</h6>
+            <p>
+                Please reach out to us to discuss your quote.
+            </p>
+            <p> Email: <a href="mailto:">info@qualitylapelpins.com</a></p>
+
+            <p>Phone: <a href="tel:+18009520305">1-800-952-0305.</a></p>
+
+            <button onclick="showForm(event)">Submit again</button>
         </div>
         <form id="quote-form" onsubmit="handleSubmit(event)" onmouseleave="handleFormExit(event)" onmouseover="handleFormEnter(event)">
             <label for="name">Name</label>
@@ -47,6 +59,8 @@
     let timerOn = false;
     const timerLimit = 60;
     const quoteForm = document.getElementById("quote-form");
+    const successMessage = document.getElementById("success-message");
+    const errorMessage = document.getElementById("error-message");
     // const tinyFormUrl = "https://qlp-server-if5ncioobq-uc.a.run.app/";
     const tinyFormUrl = "http://localhost:3000/";
     const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
@@ -174,6 +188,18 @@
 
     };
 
+    const displayMessage = (message) => {
+        quoteForm.style.display =  "none";
+        message.style.display = "flex";
+    }
+
+    const showForm = () => {
+        quoteForm.reset();
+        successMessage.style.display = "none";
+        errorMessage.style.display = "none";
+        quoteForm.style.display =  "flex";
+    }
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         const docId = sessionStorage.getItem("docId");
@@ -183,8 +209,11 @@
         if (docId) {   
             fetchManager(url, PUT, body, jsonHeader).then(() => {
                 sessionStorage.clear();
+                displayMessage(successMessage)
+
             }).catch(() => {
                 sessionStorage.clear();
+                displayMessage(errorMessage)
             });
         }
     };
@@ -196,7 +225,7 @@
         width: 400px;
     }
    #quote-form {
-    display: none;
+    display: flex;
     flex-direction: column;
    }
 
@@ -223,7 +252,7 @@
     margin-top: 15px;
    }
 
-    #quote-form input::file-selector-button, #success-message button {
+    #quote-form input::file-selector-button, .message button {
         background-color: transparent;
         border: 1px solid #0075c9;
         border-radius: 5px;
@@ -244,12 +273,7 @@
         height: 60px;
     }
 
-    #quote-form input::file-selector-button:active {
-        background-color: #0075c9;
-        color: white;
-    }
-
-    #quote-form input::file-selector-button:hover, #success-message button:hover {
+    #quote-form input::file-selector-button:hover, #quote-form input::file-selector-button:active, .message button:hover {
         background-color: #0075c9;
         color: white;
     }
@@ -260,15 +284,15 @@
         width: auto;
     }
 
-    #success-message {
+    .message {
         font-family: Arial, Helvetica, sans-serif;
-        display: flex;
+        display: none;
         flex-direction: column;
         justify-content: center;
         align-items: center;
     }
 
-    #success-message h2 {
+    .message h2 {
         font-weight: 300;
         margin-bottom: 0px;
         padding-bottom: 0px;
@@ -276,19 +300,24 @@
         color: #0075c9;
     }
 
-    #success-message h6 {
+    .message h6 {
         margin-top: 10px;
+        font-size: 12px;
     }
 
-    #success-message p {
+    .message p {
         width: 95%;
         text-align: center;
         margin-top: 0px;
     }
 
-    #success-message a {
+    .message a {
         color: #0075c9;
         text-decoration: none;
+    }
+
+    #error-message h2 {
+        color: red;
     }
 </style>
 </body>
