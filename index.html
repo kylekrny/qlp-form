@@ -36,10 +36,178 @@
             <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
             <label for="email">Email</label>
             <input type="email" name="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
+            <label for="product">product</label>
+            <select name="product" id="product" onchange="handleTextInput(event)">
+                <option value="Lapel Pins">Lapel Pins</option>
+                <option value="Challenge Coins">Challenge Coins</option>
+                <option value="Embroidered Patches">Embroidered Patches</option>
+                <option value="Belt Buckles">Belt Buckles</option>
+                <option value="Charms">Charms</option>
+                <option value="Lanyards">Lanyards</option>
+                <option value="Apple Watch Charms">Apple Watch Charms</option>
+                <option value="Award Medals">Award Medals</option>
+                <option value="Bolo Ties">Bolo Ties</option>
+                <option value="Commendation medals">Commendation medals</option>
+                <option value="Cuff Links">Cuff Links</option>
+                <option value="Dash Plaques">Dash Plaques</option>
+                <option value="Drape Chest Medals">Drape Chest Medals</option>
+                <option value="Dog Tags">Dog Tags</option>
+                <option value="Bracelet Charms">Bracelet Charms</option>
+                <option value="Earrings">Earrings</option>
+                <option value="Fiesta Medals">Fiesta Medals</option>
+                <option value="Golf Ball Markers">Golf Ball Markers</option>
+                <option value="Grille Badges">Grille Badges</option>
+                <option value="Hat Clips">Hat Clips</option>
+                <option value="Hats and Beanies">Hats and Beanies</option>
+                <option value="Key Chains">Key Chains</option>
+                <option value="Koozies">Koozies</option>
+                <option value="Leather Key Chains">Leather Key Chains</option>
+                <option value="Leather Key Fobs">Leather Key Fobs</option>
+                <option value="Leather Koozies">Leather Koozies</option>
+                <option value="Leather Wallets">Leather Wallets</option>
+                <option value="Money Clips">Money Clips</option>
+                <option value="Necklace Pendants">Necklace Pendants</option>
+                <option value="Ornaments">Ornaments</option>
+                <option value="Poker Chips">Poker Chips</option>
+                <option value="Stickers">Stickers</option>
+                <option value="Security Badges">Security Badges</option>
+                <option value="Shoelace Charms">Shoelace Charms</option>
+                <option value="Silicone Bracelets">Silicone Bracelets</option>
+                <option value="Tie Bars">Tie Bars</option>
+                <option value="Watch Band Charms">Watch Band Charms</option>
+                <option value="Wine Charms">Wine Charms</option>
+                <option value="Zipper Pulls">Zipper Pulls</option>
+            </select>
             <label for="size">Size</label>
             <input type="text" name="size" id="size" onblur="handleTextInput(event)">
             <label for="quantity">Quantity</label>
             <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)" min="1">
+            <label for="location"></label>
+            <select name="shippingLocation" id="shippingLocation">
+                    <option value="US - Alabama">US - Alabama</option>
+                    <option value="US - Alaska">US - Alaska</option>
+                    <option value="US - Arizona">US - Arizona</option>
+                    <option value="US - Arkansas">US - Arkansas</option>
+                    <option value="US - California">US - California</option>
+                    <option value="US - Colorado">US - Colorado</option>
+                    <option value="US - Connecticut">US - Connecticut</option>
+                    <option value="US - Delaware">US - Delaware</option>
+                    <option value="US - District of Columbia">US - District of Columbia</option>
+                    <option value="US - Florida">US - Florida</option>
+                    <option value="US - Georgia">US - Georgia</option>
+                    <option value="US - Hawaii">US - Hawaii</option>
+                    <option value="US - Idaho">US - Idaho</option>
+                    <option value="US - Illinois">US - Illinois</option>
+                    <option value="US - Indiana">US - Indiana</option>
+                    <option value="US - Iowa">US - Iowa</option>
+                    <option value="US - Kansas">US - Kansas</option>
+                    <option value="US - Kentucky">US - Kentucky</option>
+                    <option value="US - Louisiana">US - Louisiana</option>
+                    <option value="US - Maine">US - Maine</option>
+                    <option value="US - Maryland">US - Maryland</option>
+                    <option value="US - Massachusetts">US - Massachusetts</option>
+                    <option value="US - Michigan">US - Michigan</option>
+                    <option value="US - Minnesota">US - Minnesota</option>
+                    <option value="US - Mississippi">US - Mississippi</option>
+                    <option value="US - Missouri">US - Missouri</option>
+                    <option value="US - Montana">US - Montana</option>
+                    <option value="US - Nebraska">US - Nebraska</option>
+                    <option value="US - Nevada">US - Nevada</option>
+                    <option value="US - New Hampshire">US - New Hampshire</option>
+                    <option value="US - New Jersey">US - New Jersey</option>
+                    <option value="US - New Mexico">US - New Mexico</option>
+                    <option value="US - New York">US - New York</option>
+                    <option value="US - North Carolina">US - North Carolina</option>
+                    <option value="US - North Dakota">US - North Dakota</option>
+                    <option value="US - Ohio">US - Ohio</option>
+                    <option value="US - Oklahoma">US - Oklahoma</option>
+                    <option value="US - Oregon">US - Oregon</option>
+                    <option value="US - Pennsylvania">US - Pennsylvania</option>
+                    <option value="US - Rhode Island">US - Rhode Island</option>
+                    <option value="US - South Carolina">US - South Carolina</option>
+                    <option value="US - South Dakota">US - South Dakota</option>
+                    <option value="US - Tennessee">US - Tennessee</option>
+                    <option value="US - Texas">US - Texas</option>
+                    <option value="US - Utah">US - Utah</option>
+                    <option value="US - Vermont">US - Vermont</option>
+                    <option value="US - Virginia">US - Virginia</option>
+                    <option value="US - Washington">US - Washington</option>
+                    <option value="US - West Virginia">US - West Virginia</option>
+                    <option value="US - Wisconsin">US - Wisconsin</option>
+                    <option value="US - Wyoming">US - Wyoming</option>
+                    <option value="APO - FPO">APO - FPO</option>
+                    <option value="Canada - Alberta">Canada - Alberta</option>
+                    <option value="Canada - British Columbia">Canada - British Columbia</option>
+                    <option value="Canada - Manitoba">Canada - Manitoba</option>
+                    <option value="Canada - New Brunswick">Canada - New Brunswick</option>
+                    <option value="Canada - Newfoundland">Canada - Newfoundland</option>
+                    <option value="Canada - Nova Scotia">Canada - Nova Scotia</option>
+                    <option value="Canada - Ontario">Canada - Ontario</option>
+                    <option value="Canada - Prince Edward Island">Canada - Prince Edward Island</option>
+                    <option value="Canada - Quebec">Canada - Quebec</option>
+                    <option value="Canada - Saskatchewan">Canada - Saskatchewan</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Austria">Austria</option>
+                    <option value="Belarus">Belarus</option>
+                    <option value="Belgium">Belgium</option>
+                    <option value="Bolivia">Bolivia</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Brunei Darussalam">Brunei Darussalam</option>
+                    <option value="Bulgaria">Bulgaria</option>
+                    <option value="Chile">Chile</option>
+                    <option value="China">China</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Costa Rica">Costa Rica</option>
+                    <option value="Croatia">Croatia</option>
+                    <option value="Czech Republic">Czech Republic</option>
+                    <option value="Denmark">Denmark</option>
+                    <option value="England">England</option>
+                    <option value="Finland">Finland</option>
+                    <option value="France">France</option>
+                    <option value="Germany">Germany</option>
+                    <option value="Greece">Greece</option>
+                    <option value="Guatemala">Guatemala</option>
+                    <option value="India">India</option>
+                    <option value="Indonesia">Indonesia</option>
+                    <option value="Ireland">Ireland</option>
+                    <option value="Israel">Israel</option>
+                    <option value="Italy">Italy</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Latvia">Latvia</option>
+                    <option value="Lithuania">Lithuania</option>
+                    <option value="Luxembourg">Luxembourg</option>
+                    <option value="Macedonia">Macedonia</option>
+                    <option value="Malaysia">Malaysia</option>
+                    <option value="Mexico">Mexico</option>
+                    <option value="Myanmar">Myanmar</option>
+                    <option value="Nepal">Nepal</option>
+                    <option value="Netherlands">Netherlands</option>
+                    <option value="New Zealand">New Zealand</option>
+                    <option value="Norway">Norway</option>
+                    <option value="Panama">Panama</option>
+                    <option value="Peru">Peru</option>
+                    <option value="Philippines">Philippines</option>
+                    <option value="Poland">Poland</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="Puerto Rico">Puerto Rico</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Scotland">Scotland</option>
+                    <option value="Singapore">Singapore</option>
+                    <option value="Slovenia">Slovenia</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="South Korea">South Korea</option>
+                    <option value="Spain">Spain</option>
+                    <option value="Sweden">Sweden</option>
+                    <option value="Switzerland">Switzerland</option>
+                    <option value="Taiwan">Taiwan</option>
+                    <option value="Thailand">Thailand</option>
+                    <option value="Uruguay">Uruguay</option>
+                    <option value="Venezuela">Venezuela</option>
+                    <option value="Wales">Wales</option>
+                    <option value="Yugoslavia">Yugoslavia</option>
+                    <option value="Other">Other</option>
+            </select>
             <label for="message">Message</label>
             <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
             <label for="image1">Image #1 to upload</label>
@@ -111,7 +279,7 @@
     const handleTextInput = async (event) => {
         if (event.target.value) {   
             let docId = sessionStorage.getItem("docId")
-            const body = JSON.stringify({[event.target.id]: event.target.value, product: "Soft Enamel Pin"});
+            const body = JSON.stringify({[event.target.id]: event.target.value});
             const url = `${tinyFormUrl}quote${docId ? `/${docId}` : ''}`;
             const method = docId ? PUT : POST;
 
@@ -235,7 +403,8 @@
     margin-top: 10px;
    }
 
-   #quote-form input, textarea {
+
+   #quote-form input, textarea, select {
     border-radius: 5px;
     border: 1px solid #c9cfd6;
     height: 30px;
