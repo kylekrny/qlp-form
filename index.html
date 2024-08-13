@@ -19,6 +19,9 @@
 
             <button onclick="showForm(event)">Submit again</button>
         </div>
+        <div id="loading" class="message">
+             <img src="https://ik.imagekit.io/kylekrny/Spinner@1x-1.0s-200px-200px.gif?updatedAt=1723554463306" alt="" srcset="" width="128px">
+        </div>
         <div id="error-message" class="message">
            <h2>Whoops!</h2>
             <h6>There was an internal error.</h6>
@@ -33,57 +36,16 @@
         </div>
         <form id="quote-form" onsubmit="handleSubmit(event)" onmouseleave="handleFormExit(event)" onmouseover="handleFormEnter(event)">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" onblur="handleTextInput(event)" autocomplete="name">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" onblur="handleTextInput(event)" autocomplete="email">
-            <label for="product">product</label>
-            <select name="product" id="product" onchange="handleTextInput(event)">
-                <option value="Lapel Pins">Lapel Pins</option>
-                <option value="Challenge Coins">Challenge Coins</option>
-                <option value="Embroidered Patches">Embroidered Patches</option>
-                <option value="Belt Buckles">Belt Buckles</option>
-                <option value="Charms">Charms</option>
-                <option value="Lanyards">Lanyards</option>
-                <option value="Apple Watch Charms">Apple Watch Charms</option>
-                <option value="Award Medals">Award Medals</option>
-                <option value="Bolo Ties">Bolo Ties</option>
-                <option value="Commendation medals">Commendation medals</option>
-                <option value="Cuff Links">Cuff Links</option>
-                <option value="Dash Plaques">Dash Plaques</option>
-                <option value="Drape Chest Medals">Drape Chest Medals</option>
-                <option value="Dog Tags">Dog Tags</option>
-                <option value="Bracelet Charms">Bracelet Charms</option>
-                <option value="Earrings">Earrings</option>
-                <option value="Fiesta Medals">Fiesta Medals</option>
-                <option value="Golf Ball Markers">Golf Ball Markers</option>
-                <option value="Grille Badges">Grille Badges</option>
-                <option value="Hat Clips">Hat Clips</option>
-                <option value="Hats and Beanies">Hats and Beanies</option>
-                <option value="Key Chains">Key Chains</option>
-                <option value="Koozies">Koozies</option>
-                <option value="Leather Key Chains">Leather Key Chains</option>
-                <option value="Leather Key Fobs">Leather Key Fobs</option>
-                <option value="Leather Koozies">Leather Koozies</option>
-                <option value="Leather Wallets">Leather Wallets</option>
-                <option value="Money Clips">Money Clips</option>
-                <option value="Necklace Pendants">Necklace Pendants</option>
-                <option value="Ornaments">Ornaments</option>
-                <option value="Poker Chips">Poker Chips</option>
-                <option value="Stickers">Stickers</option>
-                <option value="Security Badges">Security Badges</option>
-                <option value="Shoelace Charms">Shoelace Charms</option>
-                <option value="Silicone Bracelets">Silicone Bracelets</option>
-                <option value="Tie Bars">Tie Bars</option>
-                <option value="Watch Band Charms">Watch Band Charms</option>
-                <option value="Wine Charms">Wine Charms</option>
-                <option value="Zipper Pulls">Zipper Pulls</option>
-            </select>
-            <label for="size">Size</label>
-            <input type="text" name="size" id="size" onblur="handleTextInput(event)">
+            <input type="text" name="name" placeholder="John Lapel" id="name" onblur="handleTextInput(event)" autocomplete="name">
+            <label for="email">Email <span class="helper">You will NOT be added to a mailing list.</span></label>
+            <input type="email" name="email" placeholder="johnlapel@pins.com" id="email" onblur="handleTextInput(event)" autocomplete="email">
+            <label for="size">Size <span class="helper">(in inches)</span></label>
+            <input type="text" name="size" id="size" placeholder="2 inches" onblur="handleTextInput(event)">
             <label for="quantity">Quantity</label>
-            <input type="number" name="quantity" id="quantity" onblur="handleTextInput(event)" min="1">
-            <label for="location"></label>
-            <select name="shippingLocation" id="shippingLocation">
+            <input type="number" name="quantity" id="quantity" placeholder="ex. 100" onblur="handleTextInput(event)" min="1">
+            <label for="location">Shipping Location</label>
+            <select name="shippingLocation" id="shippingLocation" plac>
+                    <option value="" disabled selected>Select your location</option>
                     <option value="US - Alabama">US - Alabama</option>
                     <option value="US - Alaska">US - Alaska</option>
                     <option value="US - Arizona">US - Arizona</option>
@@ -209,7 +171,7 @@
                     <option value="Other">Other</option>
             </select>
             <label for="message">Message</label>
-            <textarea name="message" id="message" onblur="handleTextInput(event)"></textarea>
+            <textarea name="message" id="message" placeholder="Your message.." onblur="handleTextInput(event)"></textarea>
             <label for="image1">Image #1 to upload</label>
             <input type="file" name="image1" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
             <label for="image2">Image #2 to upload</label>
@@ -225,6 +187,7 @@
     let timer = 0;
     let timeout;
     let timerOn = false;
+    const productName = "Soft Enamel Lapel Pins"
     const timerLimit = 60;
     const quoteForm = document.getElementById("quote-form");
     const successMessage = document.getElementById("success-message");
@@ -279,7 +242,7 @@
     const handleTextInput = async (event) => {
         if (event.target.value) {   
             let docId = sessionStorage.getItem("docId")
-            const body = JSON.stringify({[event.target.id]: event.target.value});
+            const body = JSON.stringify({[event.target.id]: event.target.value, product: productName});
             const url = `${tinyFormUrl}quote${docId ? `/${docId}` : ''}`;
             const method = docId ? PUT : POST;
 
@@ -391,8 +354,9 @@
 
     #form-container {
         width: 400px;
+        font-family: Arial, Helvetica, sans-serif;
     }
-    
+
    #quote-form {
     display: flex;
     flex-direction: column;
@@ -420,6 +384,27 @@
     border-radius: 10px;
     border: none;
     margin-top: 15px;
+    transition: background-color 0.1s ease-in-out;
+   }
+
+   #quote-form button:hover {
+    background-color: #006ab7;
+    /* box-shadow: 0 1px 1px rgba(0,0,0,0.12), 
+                0 2px 2px rgba(0,0,0,0.12), 
+                0 4px 4px rgba(0,0,0,0.12), 
+                0 8px 8px rgba(0,0,0,0.12),
+                0 16px 16px rgba(0,0,0,0.12); */
+   }
+
+   #quote-form button:active {
+    background-color: transparent;
+    color: #0075c9;
+   }
+
+   #quote-form .helper {
+    font-size: 11px;
+    font-weight: 300;
+    color: black;
    }
 
     #quote-form input::file-selector-button, .message button {
