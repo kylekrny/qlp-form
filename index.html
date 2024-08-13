@@ -20,10 +20,10 @@
             <button onclick="showForm(event)">Submit again</button>
         </div>
         <div id="loading" class="message">
-             <img src="https://ik.imagekit.io/kylekrny/Spinner@1x-1.0s-200px-200px.gif?updatedAt=1723554463306" alt="" srcset="" width="128px">
+            <img src="https://ik.imagekit.io/kylekrny/Spinner@1x-1.0s-200px-200px.gif?updatedAt=1723554463306" alt="" srcset="" width="128px">
         </div>
         <div id="error-message" class="message">
-           <h2>Whoops!</h2>
+            <h2>Whoops!</h2>
             <h6>There was an internal error.</h6>
             <p>
                 Please reach out to us to discuss your quote.
@@ -192,6 +192,7 @@
     const quoteForm = document.getElementById("quote-form");
     const successMessage = document.getElementById("success-message");
     const errorMessage = document.getElementById("error-message");
+    const loading = document.getElementById("loading")
     // const tinyFormUrl = "https://qlp-server-if5ncioobq-uc.a.run.app/";
     const tinyFormUrl = "http://localhost:3000/";
     const imageKitUrl = "https://upload.imagekit.io/api/v1/files/upload";
@@ -319,8 +320,11 @@
 
     };
 
-    const displayMessage = (message) => {
+    const displayMessage = (message, otherMessage) => {
         quoteForm.style.display =  "none";
+        if (otherMessage) {
+            otherMessage.style.display = "none";
+        }
         message.style.display = "flex";
     }
 
@@ -333,18 +337,22 @@
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+
         const docId = sessionStorage.getItem("docId");
         const url = `${tinyFormUrl}quote/${docId}`;
         const body = JSON.stringify({submitted: true});
 
+
         if (docId) {   
+            displayMessage(loading);
             fetchManager(url, PUT, body, jsonHeader).then(() => {
                 sessionStorage.clear();
-                displayMessage(successMessage)
+                displayMessage(successMessage, loading)
 
             }).catch(() => {
                 sessionStorage.clear();
-                displayMessage(errorMessage)
+                displayMessage(errorMessage, loading)
             });
         }
     };
@@ -445,6 +453,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        height: 100%;
+        min-height: 400px;
     }
 
     .message h2 {
