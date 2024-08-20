@@ -182,7 +182,6 @@
 <script>
     sessionStorage.clear();
     let fileName = "";
-    let imageCount = 0;
     let formOccupied = false;
     let timer = 0;
     let timeout;
@@ -311,9 +310,7 @@
 
     const handleImageInput = async (event) => {
         const docId = sessionStorage.getItem("docId")
-
-        console.log(event.target.name);
-
+        
         if (event.target.value && docId) {   
             let fileType = event.target.files[0].type;
             let fileExt = fileType.slice((fileType.lastIndexOf("/") - 1 >>> 0) + 2);
