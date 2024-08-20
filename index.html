@@ -38,13 +38,13 @@
             <label for="name">Name</label>
             <input type="text" name="name" placeholder="John Lapel" id="name" onblur="handleTextInput(event)" autocomplete="name">
             <label for="email">Email <span class="helper">You will NOT be added to a mailing list.</span></label>
-            <input type="email" name="email" placeholder="johnlapel@pins.com" id="email" onblur="handleTextInput(event)" autocomplete="email">
+            <input type="email" name="email" placeholder="youremail@youremail.com" id="email" onblur="handleTextInput(event)" autocomplete="email">
             <label for="size">Size <span class="helper">(in inches)</span></label>
-            <input type="text" name="size" id="size" placeholder="2 inches" onblur="handleTextInput(event)">
+            <input type="text" name="size" id="size" placeholder="1 inch" onblur="handleTextInput(event)">
             <label for="quantity">Quantity</label>
             <input type="number" name="quantity" id="quantity" placeholder="ex. 100" onblur="handleTextInput(event)" min="1">
             <label for="location">Shipping Location</label>
-            <select name="shippingLocation" id="shippingLocation" plac>
+            <select name="shippingLocation" id="shippingLocation" onChange="handleTextInput(event)">
                     <option value="" disabled selected>Select your location</option>
                     <option value="US - Alabama">US - Alabama</option>
                     <option value="US - Alaska">US - Alaska</option>
@@ -171,11 +171,11 @@
                     <option value="Other">Other</option>
             </select>
             <label for="message">Message</label>
-            <textarea name="message" id="message" placeholder="Your message.." onblur="handleTextInput(event)"></textarea>
-            <label for="image1">Image #1 to upload</label>
-            <input type="file" name="image1" id="image1" class="image-input" accept="image/*" onchange="handleImageInput(event)">
-            <label for="image2">Image #2 to upload</label>
-            <input type="file" name=image2" id="image2" accept="image/*" class="image-input" onchange="handleImageInput(event)">
+            <textarea name="message" id="message" placeholder="questions, comments, phone number, etc.." onblur="handleTextInput(event)"></textarea>
+            <label for="image1">Image #1 to upload <span class="image-helper">10MB limit (optional)</span></label>
+            <input type="file" name="image1" id="image1" class="image-input" accept=".ai, .eps, .pdf, .doc, .otp, .jpg, .gif, .png, .avif, .webp, .docx, .svg" onchange="handleImageInput(event)">
+            <label for="image2">Image #2 to upload <span class="image-helper">10MB limit (optional)</span></label>
+            <input type="file" name="image2" id="image2" accept=".ai, .eps, .pdf, .doc, .otp, .jpg, .gif, .png, .avif, .webp, .docx, .svg" class="image-input" onchange="handleImageInput(event)">
             <button type="submit">Submit</button>
         </form>
     </div>
@@ -187,8 +187,10 @@
     let timer = 0;
     let timeout;
     let timerOn = false;
+    let imageName = ""
     const productName = "Soft Enamel Lapel Pins"
     const timerLimit = 60;
+
     const quoteForm = document.getElementById("quote-form");
     const successMessage = document.getElementById("success-message");
     const errorMessage = document.getElementById("error-message");
@@ -229,8 +231,9 @@
 
         // uploads image to image kit
         fetchManager(imageKitUrl, POST, formData).then((data) => {
+            // const fileExtension = data.name.slice((data.name.lastIndexOf(".") - 1 >>> 0) + 2);
             const serializedData = {url: data.url, name: data.name}
-            const imageBody = JSON.stringify({[`image${imageCount}`]: serializedData});
+            const imageBody = JSON.stringify({[imageName]: serializedData});
             // sends data we get back from image kit to server
             fetchManager(putURL, PUT, imageBody, jsonHeader).then(() => {
             }).catch((err) => {
@@ -261,7 +264,7 @@
         timeout = setTimeout(manageTimeout, 1000);
 
         if (timer >= timerLimit) {
-             const docId = sessionStorage.getItem("docId");
+            const docId = sessionStorage.getItem("docId");
             const exitUrl = `${tinyFormUrl}exit/${docId}`;
             const body = JSON.stringify({abandoned: true});
 
@@ -294,7 +297,7 @@
 
     async function photoAuth () {
         const url = `${tinyFormUrl}upload`;
-        return fetchManager(url, GET)
+        return fetchManager(url, GET);
     };
     
 
@@ -309,11 +312,15 @@
     const handleImageInput = async (event) => {
         const docId = sessionStorage.getItem("docId")
 
+        console.log(event.target.name);
+
         if (event.target.value && docId) {   
-            fileName = event.target.files[0].name
+            let fileType = event.target.files[0].type;
+            let fileExt = fileType.slice((fileType.lastIndexOf("/") - 1 >>> 0) + 2);
+            imageName = event.target.name
+            fileName = `qlp.${fileExt}`
             
             let reader = new FileReader();
-            imageCount ++;
             reader.onload = logFile;
             reader.readAsDataURL(event.target.files[0])
         };
@@ -337,12 +344,9 @@
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-
         const docId = sessionStorage.getItem("docId");
         const url = `${tinyFormUrl}quote/${docId}`;
         const body = JSON.stringify({submitted: true});
-
 
         if (docId) {   
             displayMessage(loading);
@@ -413,6 +417,11 @@
     font-size: 11px;
     font-weight: 300;
     color: black;
+   }
+
+    #quote-form .image-helper {
+    font-weight: 300;
+    color: gray;
    }
 
     #quote-form input::file-selector-button, .message button {
